@@ -1,0 +1,54 @@
+class ListNode:
+    def __init__(self, key = -1, val = -1, next = None, pre = None):
+        self.key = key
+        self.val = val
+        self.next = next
+        self.pre = pre
+        
+        
+class LRUCache:
+    def addNode(self, node):
+        node.pre = self.head
+        node.next = self.head.next
+        self.head.next.pre = node
+        self.head.next = node
+        
+    def moveNodetoHead(self, node):
+        node.pre.next = node.next
+        node.next.pre = node.pre
+        self.addNode(node)
+    
+    def delTail(self):
+        delNode = self.tail.pre
+        delNode.pre.next = self.tail
+        self.tail.pre = delNode.pre
+        return delNode.key
+
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.maps = {}
+        self.head = ListNode()
+        self.tail = ListNode()
+        self.head.next = self.tail
+        self.tail.pre = self.head
+
+    def get(self, key: int) -> int:
+        if key in self.maps.keys():
+            curNode = self.maps[key]
+            self.moveNodetoHead(curNode)
+            return curNode.val
+        else:
+            return -1
+
+    def put(self, key: int, value: int) -> None:
+        if key in self.maps.keys():
+            curNode = self.maps[key]
+            curNode.val = value
+            self.moveNodetoHead(curNode)
+        else:
+            newNode = ListNode(key, value, None, self.head)
+            self.addNode(newNode)
+            self.maps[key] = newNode
+            if (len(self.maps) > self.capacity):
+                delKey = self.delTail()
+                del self.maps[delKey]

@@ -1,0 +1,37 @@
+class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
+        
+        maps = collections.defaultdict(str)
+        maps_name = collections.defaultdict(str)
+        maps_res = collections.defaultdict(set)
+        res = []
+        
+        for acc in accounts:
+            for email in acc[1:]:
+                maps_name[email] = acc[0]
+                maps[email] = acc[1]
+        
+        for acc in accounts:
+            group = self.find(maps, acc[1])
+            for newemail in acc[2:]:
+                maps[self.find(maps, newemail)] = group
+        
+        for acc in accounts:
+            for email in acc[1:]:
+                group = self.find(maps,email)
+                maps_res[group].add(email)
+        
+        for k, v in maps_res.items():
+            curr = []
+            curr.append(maps_name[k])
+            v = list(v)
+            curr += sorted(v)
+            res.append(curr)
+            
+        return res
+        
+    def find(self, maps, email):
+        if email == maps[email]:
+            return email
+        else:
+            return self.find(maps, maps[email])

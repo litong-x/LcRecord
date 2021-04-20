@@ -1,0 +1,31 @@
+class LFUCache:
+
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self._maps = {}
+        self._freq = collections.defaultdict(list)
+        self._minFreq = 1
+
+    def get(self, key: int) -> int:
+        if key not in self._maps.keys():
+            return -1
+        val,freq = self._maps[key]
+        self._freq[freq].remove(key)
+        self._maps[key][1] += 1
+        self._freq[freq+1].append(key)
+        if len(self._freq[self._minFreq]) == 0:
+            self._minFreq += 1
+        return val
+
+    def put(self, key: int, value: int) -> None:
+        if self.capacity <= 0:
+            return
+        if self.get(key) != -1:
+            self._maps[key][0] = value
+            return
+        if len(self._maps) >= self.capacity:
+            delKey = self._freq[self._minFreq].pop(0)
+            del self._maps[delKey]
+        self._maps[key] = [value, 1]
+        self._freq[1].append(key)
+        self._minFreq = 1
